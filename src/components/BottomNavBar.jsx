@@ -33,7 +33,7 @@ const BottomNavBar = () => {
           <span className="text-xs">Dashboard</span>
         </Link>
         <Link
-          to="/discover"
+          to="/"
           className="flex flex-col items-center text-gray-600 hover:text-yellow-600"
         >
           <FaCompass className="text-2xl" />
