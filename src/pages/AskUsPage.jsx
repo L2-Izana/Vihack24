@@ -10,7 +10,7 @@ import {
   FaDollarSign,
   FaChevronRight,
 } from "react-icons/fa";
-
+const location_fetching = require("../utils/location_fetching.js");
 export default function AskUsPage() {
   const [isScenario1, setIsScenario1] = useState(true);
 
@@ -118,7 +118,7 @@ const Scenario2Component = ({ handleStageChanging }) => {
           <button
             type="button"
             className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg text-lg flex items-center justify-center"
-            onClick={handleStageChanging}
+            onClick={() => location_fetching.fetchNearbyRestaurants()}
           >
             <span>Recommend</span>
             <FaChevronRight className="ml-2" />
