@@ -1,16 +1,18 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { FaAppleAlt, FaPizzaSlice } from "react-icons/fa";
 import FormElement from "../components/auth/FormElement";
+import { PIZZA_ICON, APPLE_ICON } from "../assets/icons";
 
 const AuthPage = () => {
-  const pizzaSliceIcon = (
-    <FaPizzaSlice className="text-3xl text-red-600 mx-auto mb-2" />
-  );
-  const appleIcon = (
-    <FaAppleAlt className="text-3xl text-green-600 mx-auto mb-2" />
-  );
+  // State for form inputs
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [retypePassword, setRetypePassword] = useState("");
 
+  // Handle input changes
+  const handleUsernameChange = (e) => setUsername(e.target.value);
+  const handlePasswordChange = (e) => setPassword(e.target.value);
+  const handleRetypePasswordChange = (e) => setRetypePassword(e.target.value);
   const [isLogin, setIsLogin] = useState(true);
 
   const handleToggle = () => {
@@ -19,10 +21,28 @@ const AuthPage = () => {
 
   const navigate = useNavigate();
 
+  const restartRegister = () => {
+    setUsername("");
+    setPassword("");
+    setRetypePassword("");
+  };
+
+  // Later, replace with function that checks with database for credentials
+  const isPasswordValid = password.length > 6;
+  const isUserNameValid = username.length > 6;
+  const isPasswordValidLogin = isLogin && isPasswordValid;
+  const isPassWordValidRegister = retypePassword.length > 6 && isPasswordValid;
+  const isLoginValid = isUserNameValid && isPasswordValidLogin;
+  const isRegisterValid = isPassWordValidRegister && isUserNameValid;
+
   const handleSubmit = (event) => {
     event.preventDefault();
-
-    // Add authentication process here
+    if (isLoginValid || isRegisterValid) {
+      localStorage.setItem("vihackapp-username", username);
+    } else {
+      restartRegister();
+      return;
+    }
 
     navigate("/");
   };
@@ -31,7 +51,7 @@ const AuthPage = () => {
     <div className="flex items-center justify-center min-h-screen bg-yellow-50 p-4">
       <div className="w-full max-w-sm p-6 bg-white shadow-lg rounded-lg border border-gray-200">
         <div className="text-center mb-4">
-          {isLogin ? pizzaSliceIcon : appleIcon}
+          {isLogin ? PIZZA_ICON : APPLE_ICON}
           <h2 className="text-2xl font-extrabold text-gray-800 mb-2">
             {isLogin ? "Welcome Back!" : "Join Us!"}
           </h2>
@@ -42,10 +62,29 @@ const AuthPage = () => {
           </p>
         </div>
         <form onSubmit={handleSubmit}>
-          {!isLogin && <FormElement elementID="name" elementType="text" />}
-          <FormElement elementID="email" elementType="email" />
-          <FormElement elementID="password" elementType="password" />
-
+          <FormElement
+            elementID="username"
+            elementType="text"
+            elementPlaceholder="Enter your username"
+            value={username}
+            onChange={handleUsernameChange}
+          />
+          <FormElement
+            elementID="password"
+            elementType="password"
+            elementPlaceholder="Enter your password"
+            value={password}
+            onChange={handlePasswordChange}
+          />
+          {!isLogin && (
+            <FormElement
+              elementID="retype password"
+              elementType="password"
+              elementPlaceholder="Retype your password"
+              value={retypePassword}
+              onChange={handleRetypePasswordChange}
+            />
+          )}
           <button
             type="submit"
             className="w-full py-2 px-4 bg-yellow-500 text-white font-semibold rounded-md shadow-sm hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-500"
