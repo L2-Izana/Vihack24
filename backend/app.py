@@ -32,9 +32,9 @@ parsed_input = {'Budget': [],
 # Create the pipeline
 pipe = pipeline("token-classification", model=model, tokenizer=tokenizer)
 
-@app.route('/api/get-ner', methods=['GET'])
+@app.route('/api/get-ner-voice-record', methods=['GET'])
 def get_ner_analysis():
-    user_prompt = request.args.get('latitude')
+    user_prompt = request.args.get('transcript')
     for entity in pipe(user_prompt):
         if entity['entity'] == 'B-Price' or entity['entity'] == 'I-Price':
             parsed_input['Budget'].append(entity['word'][1:])
@@ -42,8 +42,7 @@ def get_ner_analysis():
             parsed_input['Cuisine/ Preference'].append(entity['word'][1:])
         elif entity['entity'] == 'B-Dish' or entity['entity'] == 'I-Dish':
             parsed_input['Dish'].append(entity['word'][1:])
-    print(parsed_input)
-            
+    return jsonify(parsed_input)            
 
 
 

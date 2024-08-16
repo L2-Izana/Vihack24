@@ -1,30 +1,31 @@
-const apiKey = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
-const apiUrl = process.env.REACT_APP_GOOGLE_MAPS_API_URL;
-const radius = 500;
-const type = "restaurant";
+import axios from "axios";
 
-function fetchNearbyRestaurants() {
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition((position) => {
-      const latitude = position.coords.latitude;
-      const longitude = position.coords.longitude;
-      const url = `${apiUrl}?location=${latitude},${longitude}&radius=${radius}&type=${type}&key=${apiKey}`;
-      console.log("Fetch URL:", url);
-      fetch(url)
-        .then((response) => response.json())
-        .then((data) =>
-          data["results"].map((restaurant) =>
-            console.log(restaurant["place_id"])
-          )
-        )
-        .catch((error) => {
-          console.error("Error:", error);
-          throw error;
-        });
-    });
-  } else {
-    alert("Geolocation is not supported by this browser.");
+export const fetchNearbyRestaurant = async () => {
+  if (!navigator.geolocation) {
+    throw new Error("Geolocation is not supported by this browser");
   }
-}
 
-module.exports = { fetchNearbyRestaurants };
+  try {
+    const position = await new Promise((resolve, reject) => {
+      navigator.geolocation.getCurrentPosition(resolve, reject);
+    });
+
+    const latitude = position.coords.latitude;
+    const longitude = position.coords.longitude;
+
+    const response = await axios.get(
+      "http://localhost:5000/api/fetch-nearby-restaurants",
+      {
+        params: {
+          latitude: latitude,
+          longitude: longitude,
+        },
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error("There was an error fetching nearby restaurants:", error);
+    throw error;
+  }
+};
