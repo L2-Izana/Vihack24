@@ -2,6 +2,7 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 import requests
 from transformers import pipeline, AutoTokenizer, AutoModelForTokenClassification
+from get_restaurants_recommendations import get_sorted_restaurants
 
 app = Flask(__name__)
 CORS(app)  
@@ -9,7 +10,7 @@ CORS(app)
 GOOGLE_MAPS_API_URL="https://maps.googleapis.com/maps/api/place/nearbysearch/json"
 GOOGLE_MAPS_API_KEY="AIzaSyBPq_817fag1tlgDk9u18ceM_lSbrJCx1Y"
 
-@app.route('/api/fetch-nearby-restaurants', methods=['GET'])
+@app.route('/api/get-restaurant-recommendations', methods=['GET'])
 def get_data():
     # Retrieve query parameters
     latitude = request.args.get('latitude')
@@ -19,10 +20,10 @@ def get_data():
     url = f'{GOOGLE_MAPS_API_URL}?location={latitude},{longitude}&radius=1000&type=restaurant&key={GOOGLE_MAPS_API_KEY}'
     response = requests.get(url)
     response_data = response.json().get('results')
-    return jsonify(response_data)
+    restaurant_recommendations = get_sorted_restaurants(response_data, (latitude, longitude))
+    return jsonify(restaurant_recommendations)
 
 
-# Load the model and tokenizer
 model_name = "tner/roberta-large-mit-restaurant"
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 model = AutoModelForTokenClassification.from_pretrained(model_name)
@@ -43,8 +44,6 @@ def get_ner_analysis():
         elif entity['entity'] == 'B-Dish' or entity['entity'] == 'I-Dish':
             parsed_input['Dish'].append(entity['word'][1:])
     return jsonify(parsed_input)            
-
-
 
 if __name__ == '__main__':
     app.run(debug=True)

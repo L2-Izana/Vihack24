@@ -1,32 +1,77 @@
-import { FaChevronRight } from "react-icons/fa";
 import { levelIcons, budgetIcons } from "./icon.js";
 import { fetchNearbyRestaurant } from "../../utils/location_fetching.js";
+import { FaChevronRight, FaSpinner, FaCheckCircle } from "react-icons/fa";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import recordAndSendTranscript from "../../utils/voice_recording.js";
 
 export default function Scenario2Component({ handleStageChanging }) {
+  const [buttonState, setButtonState] = useState("default"); // 'default', 'recording', 'calculating', 'done'
+  const navigate = useNavigate();
   const handleRecommendClick = async () => {
+    // try {
+    //   setButtonState("recording");
+    //   const result = await recordAndSendTranscript();
+    //   console.log("Result from server:", result);
+    // } catch (error) {
+    //   console.error("Error voice recording", error);
+    // }
     try {
-      const result = await recordAndSendTranscript();
-      console.log("Result from server:", result);
-      const data = await fetchNearbyRestaurant();
-      console.log(data);
+      setButtonState("calculating");
+      const restaurantRecommendations = await fetchNearbyRestaurant();
+      setButtonState("done");
+      // Wait for 2 seconds
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
+      // Navigate after waiting
+      navigate("/recommendations", {
+        state: { recommendations: restaurantRecommendations },
+      });
     } catch (error) {
       console.error("Error fetching nearby restaurants:", error);
     }
   };
-
   return (
-    <div className="p-4 bg-gray-100 rounded-lg shadow-md max-w-lg mx-auto">
-      <div className="mt-6">
-        <button
-          type="button"
-          className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg text-lg flex items-center justify-center"
-          onClick={handleRecommendClick}
-        >
-          <span>Recommend</span>
-          <FaChevronRight className="ml-2" />
-        </button>
-      </div>
+    <div className="p-4 rounded-lg shadow-md max-w-lg mx-auto">
+      <button
+        type="button"
+        className={`w-full py-2 px-4 rounded-lg text-lg flex items-center justify-center font-semibold transition-all duration-300 ${
+          buttonState === "default"
+            ? "bg-blue-500 hover:bg-blue-600 text-white"
+            : buttonState === "loading"
+            ? "bg-yellow-500 text-white"
+            : buttonState === "calculating"
+            ? "bg-orange-500 text-white"
+            : "bg-green-500 text-white"
+        }`}
+        onClick={handleRecommendClick}
+        disabled={buttonState !== "default"}
+      >
+        {buttonState === "default" && (
+          <>
+            <span>Recommend</span>
+            <FaChevronRight className="ml-2" />
+          </>
+        )}
+        {buttonState === "recording" && (
+          <>
+            <FaSpinner className="animate-spin mr-2" />
+            <span>Recording...</span>
+          </>
+        )}
+        {buttonState === "calculating" && (
+          <>
+            <FaSpinner className="animate-spin mr-2" />
+            <span>Calculating...</span>
+          </>
+        )}
+        {buttonState === "done" && (
+          <>
+            <FaCheckCircle className="mr-2" />
+            <span>Done!</span>
+          </>
+        )}
+      </button>
     </div>
   );
 }

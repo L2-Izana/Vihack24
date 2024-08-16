@@ -14,7 +14,7 @@ export const fetchNearbyRestaurant = async () => {
     const longitude = position.coords.longitude;
 
     const response = await axios.get(
-      "http://localhost:5000/api/fetch-nearby-restaurants",
+      "http://localhost:5000/api/get-restaurant-recommendations",
       {
         params: {
           latitude: latitude,
