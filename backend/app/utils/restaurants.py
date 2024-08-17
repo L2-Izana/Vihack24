@@ -5,7 +5,7 @@ from flask import jsonify
 from sklearn.preprocessing import MinMaxScaler
 
 # Base
-NUM_FEATURES = 4
+NUM_FEATURES = 5
 FEATURES = ['rating', 'distance-compatibility', 'budget-compatibility', 'cuisine-compatibility',
             'food-type-compatibility']
 
@@ -152,3 +152,4 @@ if __name__ == '__main__':
     response_data = response.json().get('results')
 
     print(get_sorted_restaurants(response_data, (latitude, longitude)))
+

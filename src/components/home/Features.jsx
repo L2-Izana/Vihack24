@@ -4,9 +4,9 @@ import { useNavigate } from "react-router-dom";
 export default function Features() {
   const navigate = useNavigate();
   return (
-    <section className="py-16 px-4">
+    <section className="py-12 px-4">
       <div className="max-w-6xl mx-auto text-center">
-        <h2 className="text-3xl font-bold mb-8">How It Works</h2>
+        {/* <h2 className="text-3xl font-bold mb-8">How It Works</h2> */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="bg-white p-6 rounded-lg shadow-lg">
             <button onClick={() => navigate("ask-us")}>
@@ -18,7 +18,7 @@ export default function Features() {
               meal for you.
             </p>
           </div>
-          <div className="bg-white p-6 rounded-lg shadow-lg">
+          {/* <div className="bg-white p-6 rounded-lg shadow-lg">
             <FaQuestionCircle className="text-yellow-600 text-5xl mb-4 mx-auto" />
             <h3 className="text-xl font-semibold mb-2">Get Suggestions</h3>
             <p className="text-gray-600 mb-4">
@@ -33,7 +33,7 @@ export default function Features() {
               Plan your meals for the day or week and enjoy stress-free meal
               planning.
             </p>
-          </div>
+          </div> */}
         </div>
       </div>
     </section>

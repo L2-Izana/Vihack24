@@ -8,7 +8,7 @@ CREATE TABLE Users(
 
 CREATE TABLE User_Allergies (
     user_allergy_id INT PRIMARY KEY AUTO_INCREMENT,
-    user_id INT NOT NULL,
+    user_username VARCHAR(50) NOT NULL,
     allergy_type ENUM(
         'Nuts',
         'Dairy',
@@ -20,12 +20,12 @@ CREATE TABLE User_Allergies (
         'Spices',
         'Other'
     ) NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES Users(user_id)
+    FOREIGN KEY (user_username) REFERENCES Users(username)
 );
 
 CREATE TABLE User_Favor_Food_Types (
     user_favor_food_type_id INT PRIMARY KEY AUTO_INCREMENT,
-    user_id INT NOT NULL,
+    user_username VARCHAR(50) NOT NULL,
     food_type ENUM(
         'Vegan',
         'Vegetarian',
@@ -39,12 +39,12 @@ CREATE TABLE User_Favor_Food_Types (
         'Organic',
         'Other'
     ) NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES Users(user_id)
+    FOREIGN KEY (user_username) REFERENCES Users(username)
 );
 
 CREATE TABLE User_Favor_Food_Cuisines (
     user_favor_food_cuisine_id INT PRIMARY KEY AUTO_INCREMENT,
-    user_id INT NOT NULL,
+    user_username VARCHAR(50) NOT NULL,
     cuisine_type ENUM(
         'Italian',
         'Mexican',
@@ -64,7 +64,7 @@ CREATE TABLE User_Favor_Food_Cuisines (
         'Caribbean',
         'Other'
     ) NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES Users(user_id)
+    FOREIGN KEY (user_username) REFERENCES Users(username)
 );
 
 CREATE TABLE Restaurants(
