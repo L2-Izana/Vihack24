@@ -1,11 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import {
-  FaHome,
-  FaDollarSign,
-  FaTachometerAlt,
-  FaCompass,
-} from "react-icons/fa";
+import { FaHome, FaTachometerAlt, FaCompass } from "react-icons/fa";
 
 const BottomNavBar = () => {
   return (
@@ -17,13 +12,6 @@ const BottomNavBar = () => {
         >
           <FaHome className="text-2xl" />
           <span className="text-xs">For You</span>
-        </Link>
-        <Link
-          to="/finance"
-          className="flex flex-col items-center text-gray-600 hover:text-yellow-600"
-        >
-          <FaDollarSign className="text-2xl" />
-          <span className="text-xs">Finance</span>
         </Link>
         <Link
           to="/dashboard"

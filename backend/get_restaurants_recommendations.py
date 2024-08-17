@@ -108,7 +108,6 @@ def calculate_restaurants_budget_compatibility(fetched_restaurants_json, input_u
         restaurants_price_level_compatibility = restaurants_price_level_compatibility.reshape(-1, 1)
         scaler = MinMaxScaler()
         scaled_restaurants_price_level_compatibility = scaler.fit_transform(restaurants_price_level_compatibility)
-        # assert scaled_restaurants_price_level_compatibility.shape == (len(fetched_restaurants_json), 1)
         return scaled_restaurants_price_level_compatibility
     except Exception as e:
         return np.repeat(0.5, len(fetched_restaurants_json)).reshape(-1, 1)
@@ -129,18 +128,14 @@ def calculate_restaurants_feature_metric(fetched_restaurants_json, current_locat
     restaurants_food_type_compatibility = calculate_restaurants_food_type_compatibility(fetched_restaurants_json)
     restaurants_food_cuisine_compatibility = calculate_restaurants_food_cuisine_compatibility(fetched_restaurants_json)
     restaurants_feature_metric = np.hstack((restaurants_weighted_rating, restaurants_distance_compatibility, restaurants_budget_compatibility, restaurants_food_type_compatibility, restaurants_food_cuisine_compatibility))
-    # assert restaurants_weighted_rating.shape[0] > 1
     return restaurants_feature_metric
 
 
 def get_sorted_restaurants(fetched_restaurants, current_location):
     restaurants_feature_metric = calculate_restaurants_feature_metric(fetched_restaurants, current_location)
     collective_weights = calculate_collective_weights()
-    # assert restaurants_feature_metric.shape[1] == 5
     restaurants_suitability = restaurants_feature_metric @ collective_weights
-    # Get the sorted indices based on the suitability scores
     sorted_indices = np.argsort(restaurants_suitability.flatten())
-    print(sorted_indices)
     sorted_restaurants = [fetched_restaurants[i] for i in sorted_indices]
     return sorted_restaurants
 

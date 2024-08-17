@@ -2,14 +2,13 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import FormElement from "../components/auth/FormElement";
 import { PIZZA_ICON, APPLE_ICON } from "../assets/icons";
+import axios from "axios";
 
 const AuthPage = () => {
-  // State for form inputs
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [retypePassword, setRetypePassword] = useState("");
 
-  // Handle input changes
   const handleUsernameChange = (e) => setUsername(e.target.value);
   const handlePasswordChange = (e) => setPassword(e.target.value);
   const handleRetypePasswordChange = (e) => setRetypePassword(e.target.value);
@@ -21,30 +20,40 @@ const AuthPage = () => {
 
   const navigate = useNavigate();
 
-  const restartRegister = () => {
+  const restartAuthen = () => {
     setUsername("");
     setPassword("");
     setRetypePassword("");
   };
 
-  // Later, replace with function that checks with database for credentials
-  const isPasswordValid = password.length > 6;
-  const isUserNameValid = username.length > 6;
-  const isPasswordValidLogin = isLogin && isPasswordValid;
-  const isPassWordValidRegister = retypePassword.length > 6 && isPasswordValid;
-  const isLoginValid = isUserNameValid && isPasswordValidLogin;
-  const isRegisterValid = isPassWordValidRegister && isUserNameValid;
-
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    if (isLoginValid || isRegisterValid) {
-      localStorage.setItem("vihackapp-username", username);
-    } else {
-      restartRegister();
-      return;
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      let response;
+      if (!isLogin) {
+        response = await axios.post("http://localhost:5000/api/register", {
+          username: username,
+          password: password,
+          retypePassword: retypePassword,
+        });
+      } else {
+        response = await axios.post("http://localhost:5000/api/login", {
+          username: username,
+          password: password,
+        });
+      }
+      alert(response.data.message);
+      if (response.status === 500) {
+        restartAuthen();
+      } else if (response.status === 201) {
+        navigate("/");
+        localStorage.setItem("vihackapp-username", username);
+      }
+      console.log("Response:", response.data);
+    } catch (error) {
+      console.error("Error:", error);
+      restartAuthen();
     }
-
-    navigate("/");
   };
 
   return (
