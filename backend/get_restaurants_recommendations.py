@@ -5,9 +5,14 @@ from flask import jsonify
 from sklearn.preprocessing import MinMaxScaler
 
 # Base
+<<<<<<< Updated upstream
 NUM_FEATURES = 5
 FEATURES = ['rating', 'distance-compatibility', 'budget-compatibility', 'cuisine-compatibility',
             'food-type-compatibility']
+=======
+NUM_FEATURES = 4
+FEATURES = ['rating', 'distance-compatibility', 'budget-compatibility', 'categories-compatibility']
+>>>>>>> Stashed changes
 
 MIN_RATINGS_THRESHOLD = 10  # Minimum number of ratings required to be considered (a threshold).
 
@@ -114,7 +119,7 @@ def calculate_restaurants_budget_compatibility(fetched_restaurants_json, input_u
         return np.repeat(0.5, len(fetched_restaurants_json)).reshape(-1, 1)
 
 
-def calculate_restaurants_food_type_compatibility(fetched_restaurants_json):
+def calculate_restaurants_categories_compatibility(fetched_restaurants_json):
     return np.repeat(0.5, len(fetched_restaurants_json)).reshape(-1, 1)
 
 
