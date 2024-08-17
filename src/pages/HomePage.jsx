@@ -5,7 +5,7 @@ import Features from "../components/home/Features";
 
 const HomePage = () => {
   return (
-    <div className="bg-gray-100 min-h-screen flex flex-col">
+    <div className="bg-gray-100">
       <HeroSection />
       <Features />
       <Suggestions />

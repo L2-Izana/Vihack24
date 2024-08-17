@@ -1,7 +1,6 @@
 import { useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import RestaurantCard from "../components/restaurants/RestaurantCard";
-import { FaChevronRight } from "react-icons/fa";
 
 export default function RecommendationsPage() {
   const [showNotification, setShowNotification] = useState(true);
