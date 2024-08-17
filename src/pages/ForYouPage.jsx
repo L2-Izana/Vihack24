@@ -1,18 +1,21 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import UserInfos from "../components/user/UserInfos";
+import { useLocation } from "react-router-dom";
 
 const ForYouPage = () => {
   const navigate = useNavigate();
   const username = localStorage.getItem("vihackapp-username") || "New User";
-
+  const location = useLocation();
+  const message = location.state?.message;
   const handleNavigate = (path) => {
     navigate(path);
   };
 
   const loginPrompt = (
     <div className="text-center my-4">
-      <p className="text-gray-600 mb-2">
+      <p className="text-red-500">You have not logged in yet.</p>
+      <p className="text-green-700 mb-2">
         Log in for a more personalized experience
       </p>
       <button
