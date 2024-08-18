@@ -46,7 +46,7 @@ const AuthPage = () => {
       if (response.status === 500) {
         restartAuthen();
       } else if (response.status === 201) {
-        navigate("/");
+        navigate("/user-info");
         localStorage.setItem("vihackapp-username", username);
       }
       console.log("Response:", response.data);

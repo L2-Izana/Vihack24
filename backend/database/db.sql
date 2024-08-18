@@ -3,7 +3,7 @@ CREATE TABLE Users(
     username VARCHAR(50) UNIQUE,
     password VARCHAR(50),
     realname VARCHAR(50) DEFAULT 'New User',
-    sex TINYINT(1) NOT NULL DEFAULT 0 COMMENT '0: unidentified, 1: male, 2: female',
+    sex TINYINT(1) NOT NULL DEFAULT 0 COMMENT '0: unidentified, 1: male, 2: female'
 );
 
 CREATE TABLE User_Allergies (
@@ -23,24 +23,24 @@ CREATE TABLE User_Allergies (
     FOREIGN KEY (user_username) REFERENCES Users(username)
 );
 
-CREATE TABLE User_Favor_Food_Types (
-    user_favor_food_type_id INT PRIMARY KEY AUTO_INCREMENT,
-    user_username VARCHAR(50) NOT NULL,
-    food_type ENUM(
-        'Vegan',
-        'Vegetarian',
-        'Pescatarian',
-        'Keto',
-        'Paleo',
-        'Gluten-Free',
-        'Dairy-Free',
-        'Low-Carb',
-        'High-Protein',
-        'Organic',
-        'Other'
-    ) NOT NULL,
-    FOREIGN KEY (user_username) REFERENCES Users(username)
-);
+    CREATE TABLE User_Favor_Food_Types (
+        user_favor_food_type_id INT PRIMARY KEY AUTO_INCREMENT,
+        user_username VARCHAR(50) NOT NULL,
+        food_type ENUM(
+            'Vegan',
+            'Vegetarian',
+            'Pescatarian',
+            'Keto',
+            'Paleo',
+            'Gluten-Free',
+            'Dairy-Free',
+            'Low-Carb',
+            'High-Protein',
+            'Organic',
+            'Other'
+        ) NOT NULL,
+        FOREIGN KEY (user_username) REFERENCES Users(username)
+    );
 
 CREATE TABLE User_Favor_Food_Cuisines (
     user_favor_food_cuisine_id INT PRIMARY KEY AUTO_INCREMENT,

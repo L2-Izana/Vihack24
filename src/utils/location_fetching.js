@@ -1,4 +1,5 @@
 import axios from "axios";
+import { NGROK_URL_BACKEND_URL } from "./ngrok_url";
 
 axios.defaults.headers.common["Authorization"] =
   "Bearer 2knRKVCJLyGdMVwnxu6c7VN9d8o_4ouHeJmhZ7TuT1xruLu5e";
@@ -20,7 +21,7 @@ export const fetchNearbyRestaurant = async () => {
     console.log(longitude);
 
     const response = await axios.get(
-      "https://f319-2a09-bac5-123-1d7-00-2f-c3.ngrok-free.app/api/get-restaurant-recommendations",
+      `${NGROK_URL_BACKEND_URL}api/get-restaurant-recommendations`,
       {
         headers: {
           "ngrok-skip-browser-warning": "69420",
@@ -31,8 +32,6 @@ export const fetchNearbyRestaurant = async () => {
         },
       }
     );
-
-    console.log(response);
     return response.data;
   } catch (error) {
     console.error("There was an error fetching nearby restaurants:", error);

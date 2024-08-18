@@ -1,33 +1,28 @@
 from flask import Blueprint, jsonify, request
 from mysql.connector import Error
 from app.models.db import get_db
-
+import json
 info_bp = Blueprint('info', __name__)
 
 @info_bp.route('/api/collect-user-base-info', methods=['POST'])
 def collect_user_base_info():
-    # (Same logic as before, use get_db() to access the database connection)
     try:
         connection = get_db()
         cursor = connection.cursor()
+        # Extract and decode the data from the request
+        data = request.data.decode('utf-8')
 
-        # Extract JSON data from the request
-        data = request.json
+        # Parse the outer JSON
+        inner_data = json.loads(data)
 
-        # Extract parameters from the JSON data
-        username = data.get('username', '')
-        real_name = data.get('realName', '')
-        sex = data.get('sex', '')
-        allergies = data.get('allergies', [])
-        food_types = data.get('foodTypes', [])
-        cuisines = data.get('cuisines', [])
-
-        # Check if user base info exists
-        cursor.execute("SELECT realname FROM Users WHERE username = %s", (username,))
-        existing_user_real_name = cursor.fetchone()[0]
-        if existing_user_real_name != 'New User':
-            return jsonify({"message": "User base info has already existed"}), 400
-
+        # Extract parameters from the inner data
+        username = inner_data.get('username', '')
+        real_name = inner_data.get('realName', '')
+        sex = inner_data.get('sex', '')
+        allergies = inner_data.get('allergies', [])
+        food_types = inner_data.get('foodTypes', [])
+        cuisines = inner_data.get('cuisines', [])
+            
         # Update user info
         sex_to_save = 1 if sex == 'Male' else 2 if sex == 'Female' else 0
         cursor.execute("UPDATE Users SET realname=%s, sex=%s WHERE username=%s", (real_name, sex_to_save, username))

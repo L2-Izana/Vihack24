@@ -8,6 +8,7 @@ import {
   allergyOptions,
   foodTypeOptions,
 } from "../components/user/user_feature_options";
+import { collectUserBaseInfo } from "../utils/save_user_info";
 
 const UserBaseInfoCollectorPage = () => {
   const { register, handleSubmit } = useForm();
@@ -21,33 +22,21 @@ const UserBaseInfoCollectorPage = () => {
   const onSubmit = async (data) => {
     try {
       const localUsername = localStorage.getItem("vihackapp-username");
-      const response = await fetch(
-        "http://localhost:5000/api/collect-user-base-info",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            ...data,
-            allergies,
-            foodTypes,
-            cuisines,
-            sex,
-            realName,
-            username: localUsername,
-          }),
-        }
-      );
-
-      if (response.ok) {
-        toast.success("Information saved successfully!");
-        navigate("/");
-      } else {
-        throw new Error("Network response was not ok.");
-      }
+      const dataToCollect = JSON.stringify({
+        ...data,
+        allergies,
+        foodTypes,
+        cuisines,
+        sex,
+        realName,
+        username: localUsername,
+      });
+      const saveUserResponse = await collectUserBaseInfo(dataToCollect);
+      console.log(saveUserResponse);
+      console.log("cc");
+      navigate("/");
     } catch (error) {
-      toast.error("An error occurred while saving information.");
+      console.log(error);
     }
   };
 
