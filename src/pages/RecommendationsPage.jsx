@@ -7,9 +7,9 @@ export default function RecommendationsPage() {
   const [showCheckoutBtn, setShowCheckoutBtn] = useState(false);
   const location = useLocation();
   const { recommendations } = location.state || {};
-  const recommendedRestaurants = recommendations;
-  console.log(recommendedRestaurants);
-  console.log("?????????");
+  const recommendedRestaurants = recommendations.sort(
+    (a, b) => -a.isOpening + b.isOpening
+  );
 
   const handleLikeRestaurants = () => {
     setShowCheckoutBtn(true);

@@ -1,24 +1,32 @@
-import { levelIcons, budgetIcons } from "./icon.js";
+import { budgetIcons } from "./icon.js";
 import { fetchNearbyRestaurant } from "../../utils/location_fetching.js";
 import { FaChevronRight, FaSpinner, FaCheckCircle } from "react-icons/fa";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-import recordAndSendTranscript from "../../utils/voice_recording.js";
+import { cuisineOptions, foodTypeOptions } from "..//user/user_feature_options";
 
 export default function Scenario2Component({ handleStageChanging }) {
   const [buttonState, setButtonState] = useState("default"); // 'default', 'recording', 'calculating', 'done'
   const navigate = useNavigate();
+  const [showUserForm, setUserForm] = useState(true);
   const handleRecommendClick = async () => {
     try {
+      const collectedData = localStorage.getItem("vihackapp-collected-data");
+      console.log(collectedData);
+      const parsedData = JSON.parse(collectedData);
+      const budgetLevel = parsedData["budget"];
+      const foodTypes = parsedData["foodTypes"];
+      const cuisines = parsedData["cuisines"];
       setButtonState("calculating");
-
       // Fetch nearby restaurant recommendations
-      const restaurantRecommendations = await fetchNearbyRestaurant();
-      console.log(restaurantRecommendations);
+      const restaurantRecommendations = await fetchNearbyRestaurant(
+        budgetLevel,
+        foodTypes,
+        cuisines
+      );
       // Wait for 2 seconds before navigating
       await new Promise((resolve) => setTimeout(resolve, 2000));
-      console.log(restaurantRecommendations);
-      console.log("cccccc");
       // Navigate with the recommendations
       navigate("/recommendations", {
         state: { recommendations: restaurantRecommendations },
@@ -30,61 +38,9 @@ export default function Scenario2Component({ handleStageChanging }) {
     }
   };
 
-  // const handleRecommendClick = async () => {
-  //   // try {
-  //   //   setButtonState("recording");
-  //   //   const result = await recordAndSendTranscript();
-  //   //   console.log("Result from server:", result);
-  //   // } catch (error) {
-  //   //   console.error("Error voice recording", error);
-  //   // }
-  //   try {
-  //     setButtonState("calculating");
-  //     const restaurantRecommendations = await fetchNearbyRestaurant();
-  //     setButtonState("done");
-  //     const restaurantRecommendationCards = Object.entries(
-  //       restaurantRecommendations
-  //     ).forEach(async ([restaurantPlaceId, restaurantRating]) => {
-  //       const response = await fetch(
-  //         `https://maps.googleapis.com/maps/api/place/details/json?place_id=${restaurantPlaceId}&key=AIzaSyBPq_817fag1tlgDk9u18ceM_lSbrJCx1Y`
-  //       );
-  //       const fetchedRestaurantJSON = response.get("result");
-  //       const restaurantName = fetchedRestaurantJSON.get("name");
-  //       const isOpening = fetchedRestaurantJSON
-  //         .get("current_opening_hours")
-  //         .get("open_now");
-  //       try {
-  //         const restaurantPhoto = fetchedRestaurantJSON["photos"];
-  //         const restaurantPhotoObject = restaurantPhoto[0];
-  //         const photoReference = restaurantPhotoObject["photo_reference"];
-  //         const imgUrl = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photoReference}&key=AIzaSyBPq_817fag1tlgDk9u18ceM_lSbrJCx1Y`;
-  //         return {
-  //           image: imgUrl,
-  //           name: restaurantName,
-  //           rating: restaurantRating,
-  //           isOpening: isOpening,
-  //         };
-  //       } catch {
-  //         return {
-  //           image:
-  //             "https://images.pexels.com/photos/262978/pexels-photo-262978.jpeg?auto=compress&cs=tinysrgb&w=600",
-  //           name: restaurantName,
-  //           rating: restaurantRating,
-  //           isOpening: isOpening,
-  //         };
-  //       }
-  //     });
-  //     // Wait for 2 seconds
-  //     await new Promise((resolve) => setTimeout(resolve, 2000));
-
-  //     // Navigate after waiting
-  //     navigate("/recommendations", {
-  //       state: { recommendations: restaurantRecommendationCards },
-  //     });
-  //   } catch (error) {
-  //     console.error("Error fetching nearby restaurants:", error);
-  //   }
-  // };
+  const closeUserForm = () => {
+    setUserForm(!showUserForm);
+  };
   return (
     <div className="p-4 rounded-lg shadow-md max-w-lg mx-auto">
       <button
@@ -126,19 +82,44 @@ export default function Scenario2Component({ handleStageChanging }) {
           </>
         )}
       </button>
+      {showUserForm ? (
+        <UserForm closeUserForm={closeUserForm} />
+      ) : (
+        <small className="text-red-500 mt-5">
+          Your preferences are safely saved! Let's check out greate
+          recommendations
+        </small>
+      )}
     </div>
   );
 }
 
 // Optional (in case our model does not work good)
-const UserForm = () => {
+const UserForm = ({ closeUserForm }) => {
+  const { register, handleSubmit } = useForm();
+  const [foodTypes, setFoodTypes] = useState([]);
+  const [cuisines, setCuisines] = useState([]);
+  const [budget, setBudget] = useState(1); // Initialize budget state
+
+  const onSubmit = async (data) => {
+    try {
+      const collectedData = JSON.stringify({
+        ...data,
+        budget,
+        foodTypes,
+        cuisines,
+      });
+      localStorage.setItem("vihackapp-collected-data", collectedData);
+      closeUserForm();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <div>
-      {" "}
-      <h2 className="text-xl font-semibold mb-4">
-        Please answer the following questions:
-      </h2>
-      <form className="space-y-6">
+      <h2 className="text-xl font-semibold my-6">How are you today?</h2>
+      <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
         <div className="flex flex-col">
           <label className="text-lg font-medium mb-2">Budget level</label>
           <div className="flex items-center justify-between mb-2">
@@ -152,39 +133,72 @@ const UserForm = () => {
             type="range"
             min="1"
             max="5"
+            value={budget}
+            onChange={(e) => setBudget(Number(e.target.value))}
             className="w-full h-2 bg-blue-200 rounded-lg appearance-none"
           />
         </div>
 
-        <div className="flex flex-col">
-          <label className="text-lg font-medium mb-2">Mood</label>
-          <div className="flex items-center justify-between mb-2">
-            {Object.keys(levelIcons).map((level) => (
-              <div key={level} className="text-center">
-                <div>{levelIcons[level]}</div>
-              </div>
+        <div className="mb-6">
+          <label className="block text-gray-700 font-medium mb-2">
+            Favorite Food Types:
+          </label>
+          <div className="flex flex-wrap gap-4">
+            {foodTypeOptions.map((option) => (
+              <label key={option} className="inline-flex items-center">
+                <input
+                  type="checkbox"
+                  value={option}
+                  {...register("foodTypes")}
+                  onChange={(e) => {
+                    const { value, checked } = e.target;
+                    setFoodTypes((prev) =>
+                      checked
+                        ? [...prev, value]
+                        : prev.filter((item) => item !== value)
+                    );
+                  }}
+                  className="form-checkbox h-5 w-5 text-pink-500"
+                />
+                <span className="ml-2 text-gray-700">{option}</span>
+              </label>
             ))}
           </div>
-          <input
-            type="range"
-            min="1"
-            max="5"
-            className="w-full h-2 bg-blue-200 rounded-lg appearance-none"
-          />
         </div>
 
-        <div className="flex flex-col">
-          <label className="text-lg font-medium mb-2">Food type</label>
-          <select className="w-full bg-white border border-gray-300 rounded-lg py-2 px-4">
-            <option value="">Select food type</option>
-            <option value="vegetarian">Vegetarian</option>
-            <option value="vegan">Vegan</option>
-            <option value="gluten-free">Gluten-Free</option>
-            <option value="halal">Halal</option>
-            <option value="kosher">Kosher</option>
-            <option value="paleo">Paleo</option>
-          </select>
+        <div className="mb-6">
+          <label className="block text-gray-700 font-medium mb-2">
+            Favorite Cuisines:
+          </label>
+          <div className="flex flex-wrap gap-4">
+            {cuisineOptions.map((option) => (
+              <label key={option} className="inline-flex items-center">
+                <input
+                  type="checkbox"
+                  value={option}
+                  {...register("cuisines")}
+                  onChange={(e) => {
+                    const { value, checked } = e.target;
+                    setCuisines((prev) =>
+                      checked
+                        ? [...prev, value]
+                        : prev.filter((item) => item !== value)
+                    );
+                  }}
+                  className="form-checkbox h-5 w-5 text-purple-500"
+                />
+                <span className="ml-2 text-gray-700">{option}</span>
+              </label>
+            ))}
+          </div>
         </div>
+
+        <button
+          type="submit"
+          className="w-full bg-pink-500 text-white font-bold py-2 px-4 rounded-md hover:bg-pink-600 focus:outline-none focus:ring focus:ring-pink-300 focus:ring-opacity-50"
+        >
+          Save Information
+        </button>
       </form>
     </div>
   );

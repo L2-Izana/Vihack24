@@ -8,6 +8,8 @@ from sklearn.metrics.pairwise import cosine_similarity
 from dotenv import load_dotenv
 from gensim.models import KeyedVectors
 import json
+import aiohttp
+import asyncio
 
 # Base
 NUM_FEATURES = 4
@@ -168,17 +170,18 @@ def calculate_restaurants_categories_compatibility(fetched_restaurants, input_ca
     scores = scores.reshape(-1, 1)
     return scores
 
-def calculate_restaurants_feature_metric(fetched_restaurants, current_location, input_categories, vector_model):
+def calculate_restaurants_feature_metric(fetched_restaurants, current_location, input_categories, vector_model, user_budget_level):
     restaurants_weighted_rating = calculate_restaurants_weighted_rating(fetched_restaurants)
     restaurants_distance_compatibility = calculate_restaurants_distance_compatibility(fetched_restaurants, current_location)
-    restaurants_budget_compatibility = calculate_restaurants_budget_compatibility(fetched_restaurants)
+    restaurants_budget_compatibility = calculate_restaurants_budget_compatibility(fetched_restaurants, user_budget_level)
     restaurants_categories_compatibility = calculate_restaurants_categories_compatibility(fetched_restaurants, input_categories, vector_model)
     restaurants_feature_metric = np.hstack((restaurants_weighted_rating, restaurants_distance_compatibility, restaurants_budget_compatibility, restaurants_categories_compatibility))
     return restaurants_feature_metric
 
 
-def get_sorted_restaurants(fetched_restaurants, current_location, input_categories, vector_model):
-    restaurants_feature_metric = calculate_restaurants_feature_metric(fetched_restaurants, current_location, input_categories, vector_model)
+def get_sorted_restaurants(fetched_restaurants, current_location, input_categories, vector_model, input_budget=2.5):
+    print(input_budget)
+    restaurants_feature_metric = calculate_restaurants_feature_metric(fetched_restaurants, current_location, input_categories, vector_model, input_budget)
 
     if isinstance(restaurants_feature_metric, pd.DataFrame):
         restaurants_feature_metric = restaurants_feature_metric.to_numpy()

@@ -27,10 +27,11 @@ env/
 *.sln
 *.swp
 *.swo
-
+*.bin
 # Logs
 *.log
 
 # Coverage reports
 .coverage
 htmlcov/
+

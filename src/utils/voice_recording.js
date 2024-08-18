@@ -1,5 +1,10 @@
 // voiceRecording.js
 import axios from "axios";
+import { NGROK_URL_BACKEND_URL } from "./ngrok_url";
+
+axios.defaults.headers.common["Authorization"] =
+  "Bearer 2knRKVCJLyGdMVwnxu6c7VN9d8o_4ouHeJmhZ7TuT1xruLu5e";
+axios.defaults.headers.post["Content-Type"] = "application/json";
 
 const recordAndSendTranscript = async () => {
   return new Promise((resolve, reject) => {
@@ -18,10 +23,15 @@ const recordAndSendTranscript = async () => {
 
         try {
           const response = await axios.get(
-            "http://localhost:5000/api/get-ner-voice-record",
-            { params: { transcript: transcript } }
+            `${NGROK_URL_BACKEND_URL}api/get-restaurant-recommendations`,
+            {
+              headers: {
+                "ngrok-skip-browser-warning": "69420",
+              },
+              params: { transcript: transcript },
+            }
           );
-          resolve(response.data); // Return the result
+          resolve(response.data);
         } catch (error) {
           console.error("Error sending transcript to server:", error);
           reject(error);

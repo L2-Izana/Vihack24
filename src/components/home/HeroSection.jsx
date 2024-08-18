@@ -17,13 +17,6 @@ export default function HeroSection() {
         Let us help you decide! Get restaurant and meal suggestions based on
         your preferences.
       </p>
-      <a
-        href="#suggestions"
-        onClick={handleDailySuggestions}
-        className="bg-yellow-500 text-white py-2 px-4 rounded-md shadow-md hover:bg-yellow-600 transition"
-      >
-        Get Daily Suggestions
-      </a>
     </header>
   );
 }
