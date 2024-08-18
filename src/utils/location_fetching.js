@@ -1,5 +1,9 @@
 import axios from "axios";
 
+axios.defaults.headers.common["Authorization"] =
+  "Bearer 2knRKVCJLyGdMVwnxu6c7VN9d8o_4ouHeJmhZ7TuT1xruLu5e";
+axios.defaults.headers.post["Content-Type"] = "application/json";
+
 export const fetchNearbyRestaurant = async () => {
   if (!navigator.geolocation) {
     throw new Error("Geolocation is not supported by this browser");
@@ -12,10 +16,15 @@ export const fetchNearbyRestaurant = async () => {
 
     const latitude = position.coords.latitude;
     const longitude = position.coords.longitude;
+    console.log(latitude);
+    console.log(longitude);
 
     const response = await axios.get(
-      "http://localhost:5000/api/get-restaurant-recommendations",
+      "https://f319-2a09-bac5-123-1d7-00-2f-c3.ngrok-free.app/api/get-restaurant-recommendations",
       {
+        headers: {
+          "ngrok-skip-browser-warning": "69420",
+        },
         params: {
           latitude: latitude,
           longitude: longitude,
@@ -23,6 +32,7 @@ export const fetchNearbyRestaurant = async () => {
       }
     );
 
+    console.log(response);
     return response.data;
   } catch (error) {
     console.error("There was an error fetching nearby restaurants:", error);

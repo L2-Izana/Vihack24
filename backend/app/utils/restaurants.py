@@ -4,9 +4,10 @@ import requests
 from flask import jsonify
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
-from gensim.models import KeyedVectors
 from sklearn.metrics.pairwise import cosine_similarity
 from dotenv import load_dotenv
+from gensim.models import KeyedVectors
+import json
 
 # Base
 NUM_FEATURES = 4
@@ -48,10 +49,6 @@ VALID_CATEGORIES = [
         'High-Protein',
         'Organic'
 ]
-
-#word2vec model loading
-model = KeyedVectors.load_word2vec_format('GoogleNews-vectors-negative300.bin', binary=True)
-
 
 
 def calculate_collective_weights(collab_user_w=BASE_COLLAB_FILTER_USER_W, col_item_w=BASE_COLLAB_FILTER_ITEM_W, content_w=BASE_CONTENT_FILTERING_W):
@@ -141,7 +138,7 @@ def get_vector(model, word):
     
  #input: user input categories (diet type, cuisines), output: compatibility with the current restaurant cuisine(s)
 
-def calculate_restaurants_categories_compatibility(fetched_restaurants, input_categories):
+def calculate_restaurants_categories_compatibility(fetched_restaurants, input_categories, model):
     input_vectors = []
     if input_categories == 'N/A':
         return 0.0 
@@ -171,17 +168,17 @@ def calculate_restaurants_categories_compatibility(fetched_restaurants, input_ca
     scores = scores.reshape(-1, 1)
     return scores
 
-def calculate_restaurants_feature_metric(fetched_restaurants, current_location, input_categories):
+def calculate_restaurants_feature_metric(fetched_restaurants, current_location, input_categories, vector_model):
     restaurants_weighted_rating = calculate_restaurants_weighted_rating(fetched_restaurants)
     restaurants_distance_compatibility = calculate_restaurants_distance_compatibility(fetched_restaurants, current_location)
     restaurants_budget_compatibility = calculate_restaurants_budget_compatibility(fetched_restaurants)
-    restaurants_categories_compatibility = calculate_restaurants_categories_compatibility(fetched_restaurants, input_categories)
+    restaurants_categories_compatibility = calculate_restaurants_categories_compatibility(fetched_restaurants, input_categories, vector_model)
     restaurants_feature_metric = np.hstack((restaurants_weighted_rating, restaurants_distance_compatibility, restaurants_budget_compatibility, restaurants_categories_compatibility))
     return restaurants_feature_metric
 
 
-def get_sorted_restaurants(fetched_restaurants, current_location, input_categories):
-    restaurants_feature_metric = calculate_restaurants_feature_metric(fetched_restaurants, current_location, input_categories)
+def get_sorted_restaurants(fetched_restaurants, current_location, input_categories, vector_model):
+    restaurants_feature_metric = calculate_restaurants_feature_metric(fetched_restaurants, current_location, input_categories, vector_model)
 
     if isinstance(restaurants_feature_metric, pd.DataFrame):
         restaurants_feature_metric = restaurants_feature_metric.to_numpy()
@@ -199,7 +196,7 @@ def get_sorted_restaurants(fetched_restaurants, current_location, input_categori
 
     return sorted_restaurants_df
 
-def fetch_restaurants(api_key, latitude, longitude, radius=3000):   
+def fetch_restaurants(api_key, latitude, longitude, radius=1000):   
     url = "https://places.googleapis.com/v1/places:searchNearby"
 
     payload = {
@@ -267,6 +264,8 @@ def filter_categories(types):
 
 ## MAIN
 if __name__ == '__main__':
+    model = KeyedVectors.load_word2vec_format('GoogleNews-vectors-negative300.bin', binary=True)
+
     # GOOGLE_MAPS_API_URL="https://maps.googleapis.com/maps/api/place/nearbysearch/json"
 
     latitude = -37.8136
@@ -316,6 +315,10 @@ if __name__ == '__main__':
     mean_price_level = data['Price Level'].mean()
     data.fillna({'Price Level': mean_price_level}, inplace=True)
 
-    result = get_sorted_restaurants(data, (latitude, longitude), input_categories) 
-
-    print(result)
+    result = get_sorted_restaurants(data, (latitude, longitude), input_categories, model) 
+    # Simplify the output to only include PlaceId and Rating
+    simplified_data = result[['PlaceId', 'Rating']]
+    simplified_dict = simplified_data.set_index('PlaceId').to_dict()['Rating']
+    
+    # Print the dictionary as a JSON-formatted string   
+    print(json.dumps(simplified_dict, indent=2))

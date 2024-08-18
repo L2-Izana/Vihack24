@@ -9,28 +9,82 @@ export default function Scenario2Component({ handleStageChanging }) {
   const [buttonState, setButtonState] = useState("default"); // 'default', 'recording', 'calculating', 'done'
   const navigate = useNavigate();
   const handleRecommendClick = async () => {
-    // try {
-    //   setButtonState("recording");
-    //   const result = await recordAndSendTranscript();
-    //   console.log("Result from server:", result);
-    // } catch (error) {
-    //   console.error("Error voice recording", error);
-    // }
     try {
       setButtonState("calculating");
-      const restaurantRecommendations = await fetchNearbyRestaurant();
-      setButtonState("done");
-      // Wait for 2 seconds
-      await new Promise((resolve) => setTimeout(resolve, 2000));
 
-      // Navigate after waiting
+      // Fetch nearby restaurant recommendations
+      const restaurantRecommendations = await fetchNearbyRestaurant();
+      console.log(restaurantRecommendations);
+      // Wait for 2 seconds before navigating
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      console.log(restaurantRecommendations);
+      console.log("cccccc");
+      // Navigate with the recommendations
       navigate("/recommendations", {
         state: { recommendations: restaurantRecommendations },
       });
     } catch (error) {
       console.error("Error fetching nearby restaurants:", error);
+    } finally {
+      setButtonState("done"); // Ensure button state is set to "done" after completion
     }
   };
+
+  // const handleRecommendClick = async () => {
+  //   // try {
+  //   //   setButtonState("recording");
+  //   //   const result = await recordAndSendTranscript();
+  //   //   console.log("Result from server:", result);
+  //   // } catch (error) {
+  //   //   console.error("Error voice recording", error);
+  //   // }
+  //   try {
+  //     setButtonState("calculating");
+  //     const restaurantRecommendations = await fetchNearbyRestaurant();
+  //     setButtonState("done");
+  //     const restaurantRecommendationCards = Object.entries(
+  //       restaurantRecommendations
+  //     ).forEach(async ([restaurantPlaceId, restaurantRating]) => {
+  //       const response = await fetch(
+  //         `https://maps.googleapis.com/maps/api/place/details/json?place_id=${restaurantPlaceId}&key=AIzaSyBPq_817fag1tlgDk9u18ceM_lSbrJCx1Y`
+  //       );
+  //       const fetchedRestaurantJSON = response.get("result");
+  //       const restaurantName = fetchedRestaurantJSON.get("name");
+  //       const isOpening = fetchedRestaurantJSON
+  //         .get("current_opening_hours")
+  //         .get("open_now");
+  //       try {
+  //         const restaurantPhoto = fetchedRestaurantJSON["photos"];
+  //         const restaurantPhotoObject = restaurantPhoto[0];
+  //         const photoReference = restaurantPhotoObject["photo_reference"];
+  //         const imgUrl = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photoReference}&key=AIzaSyBPq_817fag1tlgDk9u18ceM_lSbrJCx1Y`;
+  //         return {
+  //           image: imgUrl,
+  //           name: restaurantName,
+  //           rating: restaurantRating,
+  //           isOpening: isOpening,
+  //         };
+  //       } catch {
+  //         return {
+  //           image:
+  //             "https://images.pexels.com/photos/262978/pexels-photo-262978.jpeg?auto=compress&cs=tinysrgb&w=600",
+  //           name: restaurantName,
+  //           rating: restaurantRating,
+  //           isOpening: isOpening,
+  //         };
+  //       }
+  //     });
+  //     // Wait for 2 seconds
+  //     await new Promise((resolve) => setTimeout(resolve, 2000));
+
+  //     // Navigate after waiting
+  //     navigate("/recommendations", {
+  //       state: { recommendations: restaurantRecommendationCards },
+  //     });
+  //   } catch (error) {
+  //     console.error("Error fetching nearby restaurants:", error);
+  //   }
+  // };
   return (
     <div className="p-4 rounded-lg shadow-md max-w-lg mx-auto">
       <button

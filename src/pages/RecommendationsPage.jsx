@@ -7,35 +7,9 @@ export default function RecommendationsPage() {
   const [showCheckoutBtn, setShowCheckoutBtn] = useState(false);
   const location = useLocation();
   const { recommendations } = location.state || {};
-  const recommendedRestaurants = recommendations
-    .map((restaurant) => {
-      const restaurantName = restaurant.name;
-      const restaurantRating = restaurant.rating;
-      const isOpening = restaurant.opening_hours
-        ? restaurant.opening_hours.open_now
-        : false;
-      try {
-        const restaurantPhoto = restaurant["photos"];
-        const restaurantPhotoObject = restaurantPhoto[0];
-        const photoReference = restaurantPhotoObject["photo_reference"];
-        const imgUrl = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photoReference}&key=AIzaSyBPq_817fag1tlgDk9u18ceM_lSbrJCx1Y`;
-        return {
-          image: imgUrl,
-          name: restaurantName,
-          rating: restaurantRating,
-          isOpening: isOpening,
-        };
-      } catch {
-        return {
-          image:
-            "https://images.pexels.com/photos/262978/pexels-photo-262978.jpeg?auto=compress&cs=tinysrgb&w=600",
-          name: restaurantName,
-          rating: restaurantRating,
-          isOpening: isOpening,
-        };
-      }
-    })
-    .sort((a, b) => b.isOpening - a.isOpening);
+  const recommendedRestaurants = recommendations;
+  console.log(recommendedRestaurants);
+  console.log("?????????");
 
   const handleLikeRestaurants = () => {
     setShowCheckoutBtn(true);
