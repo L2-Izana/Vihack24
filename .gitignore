@@ -26,3 +26,4 @@ yarn-error.log*
 
 # backend
 /backend/venv
+/backend/app/utils/GoogleNews-vectors-negative300.bin
